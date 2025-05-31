@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import type { IRegisterRequest } from "@/types/auth";
 import { register } from "@/api/auth";
@@ -16,21 +16,23 @@ export function RegForm({ className, ...props }: React.ComponentProps<"div">) {
     password: "",
     repPassword: "",
   });
-
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const response = await register(data);
-    console.log(response);
+    if (response.data.status === "OK") {
+      navigate("/sign-in");
+    }
   };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl text-center">Вход</CardTitle>
+          <CardTitle className="text-xl text-center">Регистрация</CardTitle>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="username">Имя</Label>
@@ -65,6 +67,8 @@ export function RegForm({ className, ...props }: React.ComponentProps<"div">) {
                   type="email"
                   placeholder="m@example.com"
                   required
+                  value={data.email}
+                  onChange={(e) => setData({ ...data, email: e.target.value })}
                 />
               </div>
               <div className="grid gap-3">
@@ -99,7 +103,7 @@ export function RegForm({ className, ...props }: React.ComponentProps<"div">) {
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
-                  Войти
+                  Зарегистрироваться
                 </Button>
               </div>
             </div>
@@ -109,7 +113,7 @@ export function RegForm({ className, ...props }: React.ComponentProps<"div">) {
                 to="/sign-in"
                 className="text-primary underline underline-offset-4"
               >
-                Зарегистрироваться
+                Войти
               </Link>
             </div>
           </form>
