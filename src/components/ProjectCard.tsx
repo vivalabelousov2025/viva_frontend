@@ -9,21 +9,21 @@ import {
   UsersIcon,
 } from "lucide-react";
 
-export default function ProjectCard() {
-  const project = {
-    title: "Название 1",
-    status: "Отклонено",
-    customer: "Артур Новиков",
-    description: "—",
-    startDate: "02.03.2025",
-    endDate: "02.03.2025",
-    teamSize: 5,
-    budget: "120.000$",
-  };
+export type Project = {
+  title: string;
+  status: string;
+  customer: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  teamSize: number;
+  budget: string;
+};
 
+export function ProjectCard({ project }: { project: Project }) {
   return (
-    <Card className="max-w-2xl mx-auto mt-10 shadow-md rounded-xl">
-      <CardHeader className="flex flex-row items-center justify-between">
+    <Card className="max-w-2xl mx-auto mt-4 border-none shadow-none rounded-xl">
+      <CardHeader>
         <CardTitle className="text-2xl text-green-600 font-semibold">
           {project.title}
         </CardTitle>
@@ -31,7 +31,6 @@ export default function ProjectCard() {
           {project.status}
         </Badge>
       </CardHeader>
-
       <CardContent className="space-y-4 text-sm text-gray-700">
         <div className="flex items-center gap-2">
           <UserIcon className="w-4 h-4" />
