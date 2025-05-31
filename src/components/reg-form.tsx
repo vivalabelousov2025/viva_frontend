@@ -65,8 +65,6 @@ export function RegForm({ className, ...props }: React.ComponentProps<"div">) {
                   type="email"
                   placeholder="m@example.com"
                   required
-                  value={data.email}
-                  onChange={(e) => setData({ ...data, email: e.target.value })}
                 />
               </div>
               <div className="grid gap-3">
