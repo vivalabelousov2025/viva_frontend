@@ -19,7 +19,7 @@ function AppRoutes() {
       {isAuthenticated ? (
         <>
           <Route path="/" element={<Home />} />
-          <Route path="/my-orders" element={<Orders />} />
+          <Route path="/orders" element={<Orders />} />
           {user?.is_admin && (
             <Route path="/manager" element={<ManagerCabinet />} />
           )}

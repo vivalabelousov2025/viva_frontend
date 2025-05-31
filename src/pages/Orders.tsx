@@ -9,31 +9,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/auth-context";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useOrders } from "@/lib/hooks/orders";
 import { getCookie } from "@/lib/cookies";
-
-const applications = [
-  {
-    name: "Корпоративный портал",
-    date: "12.04.2024",
-    status: "Новая",
-    team: "",
-  },
-  {
-    name: "Электронная коммерция",
-    date: "10.04.2024",
-    status: "В работе",
-    team: "Gamma",
-  },
-  {
-    name: "Резервное копирование",
-    date: "08.04.2024",
-    status: "Новая",
-    team: "",
-  },
-  { name: "Мобильный сайт", date: "07.04.2024", status: "Новая", team: "" },
-];
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 const actions = [
   { text: "Назначена команда на проект", time: "1 час назад" },
@@ -45,16 +32,35 @@ const actions = [
   { text: "Создан проект «Электронная коммерция»", time: "Вчера" },
 ];
 
+export const STATUS_ORDER = {
+  PENDING: "Новая",
+  IN_PROGRESS: "В работе",
+  COMPLETED: "Выполнена",
+  REJECTED: "Отклонена",
+};
+export const STATUS_ORDER_VALUES = Object.values(STATUS_ORDER);
+
+interface Filters {
+  search: string;
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED" | "";
+}
+
 export const Orders = () => {
   const { user } = useAuth();
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<Filters>({
     search: "",
     status: "",
   });
-  const { data, isLoading, error } = useOrders(
+
+  const { data, isLoading, error, refetch } = useOrders(
     filters,
     getCookie("access_token") || ""
   );
+
+  useEffect(() => {
+    refetch();
+  }, [filters]);
+
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold">Мои заявки</h1>
@@ -62,14 +68,16 @@ export const Orders = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="bg-green-600 text-white">
           <CardContent className="py-6">
-            <div className="text-3xl font-bold">{data?.count}</div>
+            <div className="text-3xl font-bold">{data?.length}</div>
             <div>Всего заявок</div>
           </CardContent>
         </Card>
 
         <Card className="bg-green-600 text-white">
           <CardContent className="py-6">
-            <div className="text-3xl font-bold">4</div>
+            <div className="text-3xl font-bold">
+              {data?.filter((el) => el.status == "COMPLETED").length}
+            </div>
             <div>Активных проектов</div>
           </CardContent>
         </Card>
@@ -96,15 +104,34 @@ export const Orders = () => {
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline">Статус</Button>
+              <Button variant="outline">
+                {filters.status ? STATUS_ORDER[filters.status] : "Статус"}
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem>Все</DropdownMenuItem>
-              <DropdownMenuItem>Новая</DropdownMenuItem>
-              <DropdownMenuItem>В работе</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setFilters({ ...filters, status: "" })}
+              >
+                Все
+              </DropdownMenuItem>
+              {Object.entries(STATUS_ORDER).map(([key, value]) => (
+                <DropdownMenuItem
+                  key={key}
+                  onClick={() =>
+                    setFilters({ ...filters, status: key as Filters["status"] })
+                  }
+                >
+                  {value}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Input placeholder="Поиск..." className="w-48" />
+          <Input
+            placeholder="Поиск..."
+            className="w-48"
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            value={filters.search}
+          />
         </div>
       </div>
 
@@ -113,24 +140,38 @@ export const Orders = () => {
           <thead>
             <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
               <th className="px-4 py-2">Название</th>
-              <th className="px-4 py-2">Дата</th>
+              <th className="px-4 py-2">Дата начала работ</th>
+              <th className="px-4 py-2">Дата окончания работ</th>
               <th className="px-4 py-2">Статус</th>
               <th className="px-4 py-2">Команда</th>
             </tr>
           </thead>
           <tbody>
-            {applications.map((app, idx) => (
+            {data?.map((order, idx) => (
               <tr key={idx} className="border-t">
-                <td className="px-4 py-2">{app.name}</td>
-                <td className="px-4 py-2">{app.date}</td>
+                <td className="px-4 py-2">{order.title}</td>
+                <td className="px-4 py-2">
+                  {new Date(order.estimated_start_date).toLocaleDateString()}
+                </td>
+                <td className="px-4 py-2">
+                  {new Date(order.estimated_end_date).toLocaleDateString()}
+                </td>
                 <td className="px-4 py-2">
                   <Badge
-                    variant={app.status === "Новая" ? "default" : "secondary"}
+                    variant={
+                      order.status === "PENDING"
+                        ? "outline"
+                        : order.status == "IN_PROGRESS"
+                        ? "secondary"
+                        : order.status == "REJECTED"
+                        ? "destructive"
+                        : "default"
+                    }
                   >
-                    {app.status}
+                    {STATUS_ORDER[order.status]}
                   </Badge>
                 </td>
-                <td className="px-4 py-2">{app.team || "—"}</td>
+                <td className="px-4 py-2">{order.team?.name || "—"}</td>
               </tr>
             ))}
           </tbody>

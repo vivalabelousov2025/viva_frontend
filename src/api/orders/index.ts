@@ -1,3 +1,4 @@
+import type { IOrder } from "@/types/order";
 import { instance } from "../axios-instance";
 
 export const getOrders = async (
@@ -6,10 +7,11 @@ export const getOrders = async (
     status: string;
   },
   token: string
-) => {
+): Promise<IOrder[]> => {
   const params = new URLSearchParams();
   if (filters.search.length > 0) {
     params.set("search", filters.search);
+    params.set("field", "title");
   }
   if (filters.status.length > 0) {
     params.set("status", filters.status);
