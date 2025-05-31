@@ -45,14 +45,14 @@ export const Header = () => {
           {isAuthenticated ? (
             <>{user?.email} </>
           ) : (
-<>
-          <Button asChild variant={"outline"}>
-            <Link to="/sign-in">Войти</Link>
-          </Button>
-          <Button asChild>
-            <Link to="/sign-up">Регистрация</Link>
-          </Button>
-          </>
+            <>
+              <Button asChild variant={"outline"}>
+                <Link to="/sign-in">Войти</Link>
+              </Button>
+              <Button asChild>
+                <Link to="/sign-up">Регистрация</Link>
+              </Button>
+            </>
           )}
         </div>
       </div>
