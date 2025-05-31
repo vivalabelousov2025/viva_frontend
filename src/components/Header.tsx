@@ -33,7 +33,7 @@ export const Header = () => {
           {!user?.is_admin && (
             <>
               <li>
-                <Link to="/" className="hover:text-black">
+                <Link to="/create-order" className="hover:text-black">
                   Подать заявку
                 </Link>
               </li>
