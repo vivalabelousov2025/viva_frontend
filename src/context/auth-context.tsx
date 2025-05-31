@@ -1,14 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "@/api/auth";
-import { deleteCookie, getCookie, setCookie } from "@/lib/cookies";
-import type { ILoginRequest, IUser } from "@/types";
+import { deleteCookie, getCookie } from "@/lib/cookies";
+import type { IUser } from "@/types";
 import { getMe } from "@/api/user";
 
 interface AuthContextType {
   user: IUser | null;
   isAuthenticated: boolean;
-  login: (data: ILoginRequest) => Promise<void>;
+  setUser: (user: IUser | null) => void;
   logout: () => void;
 }
 
@@ -30,23 +29,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initAuth();
   }, []);
 
-  const handleLogin = async (data: ILoginRequest) => {
-    try {
-      const response = await login(data);
-      const { access_token, refresh_token } = response.data;
-
-      // Сохраняем токены в куки
-      setCookie("access_token", access_token, 1);
-      setCookie("refresh_token", refresh_token, 7);
-
-      setUser(user);
-      navigate("/");
-    } catch (error) {
-      console.error("Login failed:", error);
-      throw error;
-    }
-  };
-
   const handleLogout = () => {
     deleteCookie("access_token");
     deleteCookie("refresh_token");
@@ -57,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = {
     user,
     isAuthenticated: !!user,
-    login: handleLogin,
+    setUser,
     logout: handleLogout,
   };
 
