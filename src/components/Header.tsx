@@ -30,16 +30,27 @@ export const Header = () => {
               Главная
             </Link>
           </li>
-          <li>
-            <Link to="/" className="hover:text-black">
-              Подать заявку
-            </Link>
-          </li>
-          <li>
-            <Link to="/manager" className="hover:text-black">
-              Кабинет мененджера
-            </Link>
-          </li>
+          {!user?.is_admin && (
+            <>
+              <li>
+                <Link to="/" className="hover:text-black">
+                  Подать заявку
+                </Link>
+              </li>
+              <li>
+                <Link to="/my-orders" className="hover:text-black">
+                  Мои заявки
+                </Link>
+              </li>
+            </>
+          )}
+          {user?.is_admin && (
+            <li>
+              <Link to="/manager" className="hover:text-black">
+                Кабинет мененджера
+              </Link>
+            </li>
+          )}
         </ul>
         <div className="flex gap-3">
           {isAuthenticated ? (
@@ -70,44 +81,45 @@ export const Header = () => {
         <div className="absolute top-[70px] right-2 z-50 w-[90%] max-w-sm bg-white shadow-lg rounded-xl p-6 xl:hidden">
           <ul className="text-zinc-700 flex flex-col gap-4 mb-4">
             <li>
-              <Link
-                to="/"
-                onClick={() => setMenuOpen(false)}
-                className="hover:text-black"
-              >
+              <Link to="/" className="hover:text-black">
                 Главная
               </Link>
             </li>
-            <li>
-              <Link
-                to="/"
-                onClick={() => setMenuOpen(false)}
-                className="hover:text-black"
-              >
-                Подать заявку
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/manager"
-                onClick={() => setMenuOpen(false)}
-                className="hover:text-black"
-              >
-                Кабинет мененджера
-              </Link>
-            </li>
+            {!user?.is_admin && (
+              <>
+                <li>
+                  <Link to="/" className="hover:text-black">
+                    Подать заявку
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/my-orders" className="hover:text-black">
+                    Мои заявки
+                  </Link>
+                </li>
+              </>
+            )}
+            {user?.is_admin && (
+              <li>
+                <Link to="/manager" className="hover:text-black">
+                  Кабинет мененджера
+                </Link>
+              </li>
+            )}
           </ul>
           <div className="flex flex-col gap-3">
-            <Button asChild variant={"outline"}>
-              <Link to="/sign-in" onClick={() => setMenuOpen(false)}>
-                Войти
-              </Link>
-            </Button>
-            <Button asChild>
-              <Link to="/sign-up" onClick={() => setMenuOpen(false)}>
-                Регистрация
-              </Link>
-            </Button>
+            {isAuthenticated ? (
+              <>{user?.email} </>
+            ) : (
+              <>
+                <Button asChild variant={"outline"}>
+                  <Link to="/sign-in">Войти</Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/sign-up">Регистрация</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}
