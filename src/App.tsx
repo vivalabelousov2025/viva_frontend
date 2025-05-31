@@ -10,6 +10,7 @@ import { SignIn } from "./pages/SignIn";
 import { SignUp } from "./pages/SignUp";
 import { ManagerCabinet } from "./pages/ManagerCabinet";
 import { Orders } from "./pages/Orders";
+import { CreateOrder } from "./pages/CreateOrder";
 
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
@@ -19,11 +20,10 @@ function AppRoutes() {
       {isAuthenticated ? (
         <>
           <Route path="/my-orders" element={<Orders />} />
+          <Route path="/create-order" element={<CreateOrder />} />
           {user?.is_admin && (
             <Route path="/manager" element={<ManagerCabinet />} />
           )}
-          <Route path="/sign-in" element={<Navigate to="/" replace />} />
-          <Route path="/sign-up" element={<Navigate to="/" replace />} />
         </>
       ) : (
         <>
