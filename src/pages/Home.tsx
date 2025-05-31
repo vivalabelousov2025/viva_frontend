@@ -30,7 +30,7 @@ const features = [
   },
 ];
 
-export default function Home() {
+export const Home = () => {
   return (
     <div className="p-8 max-w-7xl mt-[100px] mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
@@ -63,4 +63,4 @@ export default function Home() {
       </div>
     </div>
   );
-}
+};

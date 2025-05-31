@@ -34,7 +34,7 @@ export const Header = () => {
             </Link>
           </li>
           <li>
-            <Link to="/" className="hover:text-black">
+            <Link to="/manager" className="hover:text-black">
               Кабинет мененджера
             </Link>
           </li>
@@ -81,7 +81,7 @@ export const Header = () => {
             </li>
             <li>
               <Link
-                to="/"
+                to="/manager"
                 onClick={() => setMenuOpen(false)}
                 className="hover:text-black"
               >
