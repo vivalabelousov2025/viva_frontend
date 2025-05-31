@@ -5,10 +5,6 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 
-// blobs
-import Blob1 from "../assets/svg/blob1.svg";
-import Blob2 from "../assets/svg/blob2.svg";
-
 export const OrderForm = () => {
   const handleSubmit = () => {};
 
