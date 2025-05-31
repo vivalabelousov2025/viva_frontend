@@ -38,7 +38,7 @@ export const Header = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/my-orders" className="hover:text-black">
+                <Link to="/orders" className="hover:text-black">
                   Мои заявки
                 </Link>
               </li>
@@ -93,7 +93,7 @@ export const Header = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/my-orders" className="hover:text-black">
+                  <Link to="/orders" className="hover:text-black">
                     Мои заявки
                   </Link>
                 </li>

@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/auth-context";
 import { Layout } from "./components/Layout";
 import { TanstackContext } from "./context/tanstack-context";
@@ -20,7 +20,7 @@ function AppRoutes() {
     <Routes>
       {isAuthenticated ? (
         <>
-          <Route path="/my-orders" element={<Orders />} />
+          <Route path="/orders" element={<Orders />} />
           <Route path="/create-order" element={<CreateOrder />} />
           <Route path="*" element={<NotFoundPage />} />
           {user?.is_admin && (
