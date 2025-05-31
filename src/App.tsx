@@ -18,7 +18,6 @@ function AppRoutes() {
     <Routes>
       {isAuthenticated ? (
         <>
-          <Route path="/" element={<Home />} />
           <Route path="/my-orders" element={<Orders />} />
           {user?.is_admin && (
             <Route path="/manager" element={<ManagerCabinet />} />
@@ -28,6 +27,7 @@ function AppRoutes() {
         </>
       ) : (
         <>
+          <Route path="/" element={<Home />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
         </>
