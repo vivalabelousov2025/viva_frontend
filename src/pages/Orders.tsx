@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -9,18 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/context/auth-context";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useOrders } from "@/lib/hooks/orders";
 import { getCookie } from "@/lib/cookies";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 
 const actions = [
   { text: "Назначена команда на проект", time: "1 час назад" },
@@ -32,72 +26,51 @@ const actions = [
   { text: "Создан проект «Электронная коммерция»", time: "Вчера" },
 ];
 
-export const STATUS_ORDER = {
+const STATUS_ORDER = {
   PENDING: "Новая",
   IN_PROGRESS: "В работе",
   COMPLETED: "Выполнена",
   REJECTED: "Отклонена",
 };
-export const STATUS_ORDER_VALUES = Object.values(STATUS_ORDER);
+const STATUS_ORDER_VALUES = Object.values(STATUS_ORDER);
 
+console.log(STATUS_ORDER_VALUES);
 interface Filters {
   search: string;
   status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "REJECTED" | "";
 }
 
 export const Orders = () => {
-  const { user } = useAuth();
   const [filters, setFilters] = useState<Filters>({
     search: "",
     status: "",
   });
 
-  const { data, isLoading, error, refetch } = useOrders(
-    filters,
-    getCookie("access_token") || ""
-  );
+  const { data, refetch } = useOrders(filters, getCookie("access_token") || "");
 
   useEffect(() => {
     refetch();
   }, [filters]);
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+    <div className="p-6 space-y-6 max-w-7xl mx-auto flex flex-col gap-4">
       <h1 className="text-3xl font-bold">Мои заявки</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-green-600 text-white">
-          <CardContent className="py-6">
-            <div className="text-3xl font-bold">{data?.length}</div>
-            <div>Всего заявок</div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-green-600 text-white">
-          <CardContent className="py-6">
-            <div className="text-3xl font-bold">
-              {data?.filter((el) => el.status == "COMPLETED").length}
+      <Card>
+        <CardContent className="py-4 space-y-2">
+          <h2 className="font-semibold">Последние действия</h2>
+          {actions.map((action, idx) => (
+            <div key={idx} className="text-sm flex justify-between gap-4">
+              <span className="truncate whitespace-nowrap overflow-hidden max-w-[70%]">
+                {action.text}
+              </span>
+              <span className="text-gray-500 whitespace-nowrap">
+                {action.time}
+              </span>
             </div>
-            <div>Активных проектов</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="py-4 space-y-2">
-            <h2 className="font-semibold">Последние действия</h2>
-            {actions.map((action, idx) => (
-              <div key={idx} className="text-sm flex justify-between gap-4">
-                <span className="truncate whitespace-nowrap overflow-hidden max-w-[70%]">
-                  {action.text}
-                </span>
-                <span className="text-gray-500 whitespace-nowrap">
-                  {action.time}
-                </span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-      </div>
+          ))}
+        </CardContent>
+      </Card>
 
       <div className="flex items-center justify-between">
         <div className="text-xl font-semibold">Заявки</div>
