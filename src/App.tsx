@@ -11,6 +11,7 @@ import { SignUp } from "./pages/SignUp";
 import { ManagerCabinet } from "./pages/ManagerCabinet";
 import { Orders } from "./pages/Orders";
 import { CreateOrder } from "./pages/CreateOrder";
+import NotFoundPage from "./pages/NotFound";
 
 function AppRoutes() {
   const { isAuthenticated, user } = useAuth();
@@ -21,6 +22,7 @@ function AppRoutes() {
         <>
           <Route path="/my-orders" element={<Orders />} />
           <Route path="/create-order" element={<CreateOrder />} />
+          <Route path="*" element={<NotFoundPage />} />
           {user?.is_admin && (
             <Route path="/manager" element={<ManagerCabinet />} />
           )}
