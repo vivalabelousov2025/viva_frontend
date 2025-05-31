@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/auth-context";
 import { Layout } from "./components/Layout";
 import { TanstackContext } from "./context/tanstack-context";
