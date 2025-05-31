@@ -1,12 +1,15 @@
 import type { AxiosResponse } from "axios";
 import { instance } from "../axios-instance";
-import type { ILoginResponse, IRefreshTokenRequest, IRegisterRequest, StatusOkDto } from "@/types";
+import type {
+  ILoginRequest,
+  ILoginResponse,
+  IRefreshTokenRequest,
+  IRegisterRequest,
+  StatusOkDto,
+} from "@/types";
 
-export async function login(
-  email: string,
-  password: string
-): Promise<AxiosResponse<ILoginResponse>> {
-  return await instance.post("/auth/login/", { email, password });
+export async function login(data: ILoginRequest): Promise<AxiosResponse<ILoginResponse>> {
+  return await instance.post("/auth/login/", data);
 }
 
 export async function register(

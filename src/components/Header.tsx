@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { Menu, X } from "lucide-react"; // Иконки из lucide
+import { useAuth } from "@/context/auth-context";
 
 export const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <div className="max-w-[1440px] w-full px-2 py-4 flex items-center justify-between">
@@ -40,12 +42,18 @@ export const Header = () => {
           </li>
         </ul>
         <div className="flex gap-3">
+          {isAuthenticated ? (
+            <>{user?.email} </>
+          ) : (
+<>
           <Button asChild variant={"outline"}>
             <Link to="/sign-in">Войти</Link>
           </Button>
           <Button asChild>
             <Link to="/sign-up">Регистрация</Link>
           </Button>
+          </>
+          )}
         </div>
       </div>
 
