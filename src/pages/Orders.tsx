@@ -53,7 +53,7 @@ export const Orders = () => {
   }, [filters]);
 
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto flex flex-col gap-4">
+    <div className="p-6 space-y-6 max-w-7xl mx-auto flex flex-col gap-4 ">
       <h1 className="text-3xl font-bold">Мои заявки</h1>
 
       <Card>
