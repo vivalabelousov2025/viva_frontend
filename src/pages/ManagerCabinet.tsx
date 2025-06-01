@@ -1,130 +1,326 @@
-"use client";
-
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState, useMemo } from "react";
 import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+import { useOrders } from "@/lib/hooks/orders";
+import { getCookie } from "@/lib/cookies";
+import type { IOrder } from "@/types/order";
 
-const applications = [
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+const frameworks = [
   {
-    name: "Корпоративный портал",
-    date: "12.04.2024",
-    status: "Новая",
-    team: "",
+    value: "team1",
+    label: "Team 1",
   },
   {
-    name: "Электронная коммерция",
-    date: "10.04.2024",
-    status: "В работе",
-    team: "Gamma",
+    value: "team2",
+    label: "Team 2",
   },
   {
-    name: "Резервное копирование",
-    date: "08.04.2024",
-    status: "Новая",
-    team: "",
+    value: "team3",
+    label: "Team 3",
   },
-  { name: "Мобильный сайт", date: "07.04.2024", status: "Новая", team: "" },
+  {
+    value: "team4",
+    label: "Team 4",
+  },
+  {
+    value: "team5",
+    label: "Team 5",
+  },
 ];
 
-const actions = [
-  { text: "Назначена команда на проект", time: "1 час назад" },
-  { text: "Подана заявка «Мобильный сайт»", time: "3 часа назад" },
-  {
-    text: "Обновлён трафик проекта «Электронная челентано »",
-    time: "5 часов назад",
-  },
-  { text: "Создан проект «Электронная коммерция»", time: "Вчера" },
-];
+const month = {
+  0: "Январь",
+  1: "Февраль",
+  2: "Март",
+  3: "Апрель",
+  4: "Май",
+  5: "Июнь",
+  6: "Июль",
+  7: "Август",
+  8: "Сентябрь",
+  9: "Октябрь",
+  10: "Ноябрь",
+  11: "Декабрь",
+};
 
-export default function ManagerCabinet() {
+const ManagerCabinet = () => {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
+
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const { data } = useOrders(
+    { search: "", status: "" },
+    getCookie("access_token")
+  );
+
+  const groupedOrders = useMemo(() => {
+    if (!data) return {};
+    return data.reduce((acc, order) => {
+      const teamName = order.team?.name || "Без команды";
+      if (!acc[teamName]) {
+        acc[teamName] = [];
+      }
+      acc[teamName].push(order);
+      return acc;
+    }, {} as Record<string, IOrder[]>);
+  }, [data]);
+
+  const getDaysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const days = Array.from(
+    { length: getDaysInMonth(currentDate) },
+    (_, i) => i + 1
+  );
+  const currentMonth = month[currentDate.getMonth() as keyof typeof month];
+
+  const handlePrevMonth = () => {
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+    );
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    );
+  };
+
+  const isOrderInCurrentMonth = (order: IOrder) => {
+    const startDate = new Date(order.estimated_start_date);
+    const endDate = new Date(order.estimated_end_date);
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(0, 0, 0, 0);
+    const currentMonthStart = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
+    const currentMonthEnd = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    );
+    currentMonthStart.setHours(0, 0, 0, 0);
+    currentMonthEnd.setHours(0, 0, 0, 0);
+    return startDate <= currentMonthEnd && endDate >= currentMonthStart;
+  };
+
   return (
-    <div className="p-6 space-y-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold">Кабинет менеджера</h1>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-green-600 text-white">
-          <CardContent className="py-6">
-            <div className="text-3xl font-bold">12</div>
-            <div>Новых заявок</div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-green-600 text-white">
-          <CardContent className="py-6">
-            <div className="text-3xl font-bold">4</div>
-            <div>Активных проектов</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="py-4 space-y-2">
-            <h2 className="font-semibold">Последние действия</h2>
-            {actions.map((action, idx) => (
-              <div key={idx} className="text-sm flex justify-between gap-4">
-                <span className="truncate whitespace-nowrap overflow-hidden max-w-[70%]">
-                  {action.text}
-                </span>
-                <span className="text-gray-500 whitespace-nowrap">
-                  {action.time}
-                </span>
-              </div>
+    <div className="overflow-x-auto p-4">
+      <table className="table-auto border-collapse w-full">
+        <thead>
+          <tr>
+            <th className="border p-2 text-left">Месяц, год</th>
+            <th className="border p-2" colSpan={days.length}>
+              <Button
+                variant="outline"
+                className="mr-2"
+                onClick={handlePrevMonth}
+              >
+                <ChevronLeft />
+              </Button>
+              {currentMonth}, {currentDate.getFullYear()}
+              <Button
+                variant="outline"
+                className="ml-2"
+                onClick={handleNextMonth}
+              >
+                <ChevronRight />
+              </Button>
+            </th>
+          </tr>
+          <tr>
+            <th className="border p-2 text-left">Команда</th>
+            {days.map((day) => (
+              <th key={day} className="border p-2 text-center">
+                {day}
+              </th>
             ))}
-          </CardContent>
-        </Card>
-      </div>
+          </tr>
+        </thead>
+        <tbody>
+          {Object.entries(groupedOrders).map(([teamName, orders]) => (
+            <tr key={teamName}>
+              <td className="border p-2">{teamName}</td>
+              {days.map((day) => {
+                const orderForDay = orders.find((order) => {
+                  if (order.team?.name !== teamName) return false;
+                  if (!isOrderInCurrentMonth(order)) return false;
+                  const currentDay = new Date(
+                    currentDate.getFullYear(),
+                    currentDate.getMonth(),
+                    day
+                  );
+                  const startDate = new Date(order.estimated_start_date);
+                  const endDate = new Date(order.estimated_end_date);
+                  startDate.setHours(0, 0, 0, 0);
+                  endDate.setHours(0, 0, 0, 0);
+                  currentDay.setHours(0, 0, 0, 0);
+                  return (
+                    currentDay.getTime() >= startDate.getTime() &&
+                    currentDay.getTime() <= endDate.getTime()
+                  );
+                });
 
-      <div className="flex items-center justify-between">
-        <div className="text-xl font-semibold">Заявки</div>
-        <div className="flex items-center gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">Статус</Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem>Все</DropdownMenuItem>
-              <DropdownMenuItem>Новая</DropdownMenuItem>
-              <DropdownMenuItem>В работе</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Input placeholder="Поиск..." className="w-48" />
-        </div>
-      </div>
+                if (!orderForDay) {
+                  return <td key={day} className="p-1 text-center border"></td>;
+                }
 
-      <div className="overflow-auto rounded-lg border">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr className="bg-gray-100 text-left text-sm font-semibold text-gray-700">
-              <th className="px-4 py-2">Название</th>
-              <th className="px-4 py-2">Дата</th>
-              <th className="px-4 py-2">Статус</th>
-              <th className="px-4 py-2">Команда</th>
-            </tr>
-          </thead>
-          <tbody>
-            {applications.map((app, idx) => (
-              <tr key={idx} className="border-t">
-                <td className="px-4 py-2">{app.name}</td>
-                <td className="px-4 py-2">{app.date}</td>
-                <td className="px-4 py-2">
-                  <Badge
-                    variant={app.status === "Новая" ? "default" : "secondary"}
+                // Проверяем, является ли этот день началом задачи
+                const taskStartDay = Math.max(
+                  1,
+                  new Date(orderForDay.estimated_start_date).getMonth() ===
+                    currentDate.getMonth()
+                    ? new Date(orderForDay.estimated_start_date).getDate()
+                    : 1
+                );
+
+                // Вычисляем длительность задачи в днях
+                const taskEndDay = Math.min(
+                  getDaysInMonth(currentDate),
+                  new Date(orderForDay.estimated_end_date).getMonth() ===
+                    currentDate.getMonth()
+                    ? new Date(orderForDay.estimated_end_date).getDate()
+                    : getDaysInMonth(currentDate)
+                );
+                const adjustedTaskDuration = taskEndDay - taskStartDay + 1;
+
+                const isStartOfTask = day === taskStartDay;
+
+                if (!isStartOfTask) {
+                  return null;
+                }
+
+                return (
+                  <td
+                    key={day}
+                    className="p-1 text-center border bg-green-500 text-white"
+                    {...(adjustedTaskDuration > 1
+                      ? { colSpan: adjustedTaskDuration }
+                      : {})}
                   >
-                    {app.status}
-                  </Badge>
-                </td>
-                <td className="px-4 py-2">{app.team || "—"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button className="w-full h-full cursor-pointer hover:bg-green-600 transition-colors">
+                          {orderForDay.title}
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{orderForDay.title}</DialogTitle>
+                        </DialogHeader>
+                        <div className="flex flex-col gap-2 mt-4">
+                          <p>
+                            <strong>Описание:</strong> {orderForDay.description}
+                          </p>
+                          <p>
+                            <strong>Статус:</strong> {orderForDay.status}
+                          </p>
+                          <p>
+                            <strong>Дата начала:</strong>{" "}
+                            {new Date(
+                              orderForDay.estimated_start_date
+                            ).toLocaleDateString()}
+                          </p>
+                          <p>
+                            <strong>Дата окончания:</strong>{" "}
+                            {new Date(
+                              orderForDay.estimated_end_date
+                            ).toLocaleDateString()}
+                          </p>
+                          <Popover open={open} onOpenChange={setOpen}>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={open}
+                                className="w-full justify-between"
+                              >
+                                {value
+                                  ? frameworks.find(
+                                      (framework) => framework.value === value
+                                    )?.label
+                                  : "Выберите команду..."}
+                                <ChevronsUpDown className="opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[200px] p-0">
+                              <Command>
+                                <CommandInput
+                                  placeholder="Найти команду..."
+                                  className="h-9"
+                                />
+                                <CommandList>
+                                  <CommandEmpty>
+                                    No framework found.
+                                  </CommandEmpty>
+                                  <CommandGroup>
+                                    {frameworks.map((framework) => (
+                                      <CommandItem
+                                        key={framework.value}
+                                        value={framework.value}
+                                        onSelect={(currentValue) => {
+                                          setValue(
+                                            currentValue === value
+                                              ? ""
+                                              : currentValue
+                                          );
+                                          setOpen(false);
+                                        }}
+                                      >
+                                        {framework.label}
+                                        <Check
+                                          className={cn(
+                                            "ml-auto",
+                                            value === framework.value
+                                              ? "opacity-100"
+                                              : "opacity-0"
+                                          )}
+                                        />
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
-}
+};
+
+export default ManagerCabinet;
