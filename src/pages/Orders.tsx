@@ -17,13 +17,7 @@ import { useOrders } from "@/lib/hooks/orders";
 import { getCookie } from "@/lib/cookies";
 import type { IOrder } from "@/types/order";
 import { useOrderActions } from "@/lib/hooks/order-actions";
-
-export const ORDER_STATUS = {
-  PENDING: "Новая",
-  IN_PROGRESS: "В работе",
-  COMPLETED: "Завершен",
-  REJECTED: "Отклонена",
-};
+import { ORDER_STATUS } from "@/constants/order-status";
 
 export default function Orders() {
   const [selectedProject, setSelectedProject] = useState<IOrder | null>(null);
@@ -42,6 +36,7 @@ export default function Orders() {
 
   useEffect(() => {
     refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filteredData = useMemo(() => {

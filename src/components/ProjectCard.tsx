@@ -9,7 +9,7 @@ import {
   UsersIcon,
 } from "lucide-react";
 import type { IOrder } from "@/types/order";
-import { ORDER_STATUS } from "@/pages/Orders";
+import { ORDER_STATUS } from "@/constants/order-status";
 
 export type Project = {
   title: string;
