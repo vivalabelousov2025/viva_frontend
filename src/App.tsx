@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import { Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/auth-context";
 import { Layout } from "./components/Layout";
@@ -13,7 +13,7 @@ import { ManagerCabinet } from "./pages/ManagerCabinet";
 import { Orders } from "./pages/Orders";
 import { CreateOrder } from "./pages/CreateOrder";
 import PageWrapper from "./components/AnimationPageWrapper";
-import { Loading } from "./pages";
+import Loading from "./pages/Loading";
 
 function AppRoutes() {
   const location = useLocation();
