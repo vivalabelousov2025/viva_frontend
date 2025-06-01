@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/auth-context";
 import { Layout } from "./components/Layout";
@@ -12,10 +12,8 @@ import { SignUp } from "./pages/SignUp";
 import { ManagerCabinet } from "./pages/ManagerCabinet";
 import { Orders } from "./pages/Orders";
 import { CreateOrder } from "./pages/CreateOrder";
-import NotFoundPage from "./pages/NotFound";
 import PageWrapper from "./components/AnimationPageWrapper";
-import ServerError from "./pages/ServerError";
-import Loading from "./pages/Loading";
+import { Loading } from "./pages";
 
 function AppRoutes() {
   const location = useLocation();
@@ -25,35 +23,13 @@ function AppRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route
-          path="*"
-          element={
-            <PageWrapper>
-              <NotFoundPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/loading"
-          element={
-            <PageWrapper>
-              <Loading />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/500"
-          element={
-            <PageWrapper>
-              <ServerError />
-            </PageWrapper>
-          }
-        />
-        <Route
           path="/"
           element={
-            <PageWrapper>
-              <Home />
-            </PageWrapper>
+            <Suspense fallback={<Loading />}>
+              <PageWrapper>
+                <Home />
+              </PageWrapper>
+            </Suspense>
           }
         />
         {isAuthenticated ? (
@@ -61,26 +37,32 @@ function AppRoutes() {
             <Route
               path="/orders"
               element={
-                <PageWrapper>
-                  <Orders />
-                </PageWrapper>
+                <Suspense fallback={<Loading />}>
+                  <PageWrapper>
+                    <Orders />
+                  </PageWrapper>
+                </Suspense>
               }
             />
             <Route
               path="/create-order"
               element={
-                <PageWrapper>
-                  <CreateOrder />
-                </PageWrapper>
+                <Suspense fallback={<Loading />}>
+                  <PageWrapper>
+                    <CreateOrder />
+                  </PageWrapper>
+                </Suspense>
               }
             />
             {user?.is_admin && (
               <Route
                 path="/manager"
                 element={
-                  <PageWrapper>
-                    <ManagerCabinet />
-                  </PageWrapper>
+                  <Suspense fallback={<Loading />}>
+                    <PageWrapper>
+                      <ManagerCabinet />
+                    </PageWrapper>
+                  </Suspense>
                 }
               />
             )}
@@ -90,17 +72,21 @@ function AppRoutes() {
             <Route
               path="/sign-in"
               element={
-                <PageWrapper>
-                  <SignIn />
-                </PageWrapper>
+                <Suspense fallback={<Loading />}>
+                  <PageWrapper>
+                    <SignIn />
+                  </PageWrapper>
+                </Suspense>
               }
             />
             <Route
               path="/sign-up"
               element={
-                <PageWrapper>
-                  <SignUp />
-                </PageWrapper>
+                <Suspense fallback={<Loading />}>
+                  <PageWrapper>
+                    <SignUp />
+                  </PageWrapper>
+                </Suspense>
               }
             />
           </>
