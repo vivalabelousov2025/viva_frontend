@@ -24,3 +24,12 @@ export const getOrders = async (
   });
   return response.data;
 };
+
+export const createOrder = async (order: IOrder, token: string) => {
+  const response = await instance.post(`/orders/`, order, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return response.data;
+};

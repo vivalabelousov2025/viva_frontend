@@ -3,9 +3,24 @@ import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
+import { useMutationOrder } from "@/lib/hooks/orders";
+import { getCookie } from "@/lib/cookies";
+import { useState } from "react";
+import type { IOrder } from "@/types/order";
+import { useNavigate } from "react-router-dom";
 
 export const OrderForm = () => {
-  const handleSubmit = () => {};
+  const navigate = useNavigate();
+  const { mutate } = useMutationOrder(getCookie("access_token")!);
+  const [order, setOrder] = useState<Partial<IOrder>>({
+    title: "",
+    description: "",
+  });
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    mutate(order as IOrder);
+    navigate("/orders");
+  };
 
   return (
     <Card>
@@ -22,6 +37,8 @@ export const OrderForm = () => {
                 type="text"
                 placeholder="Введите название"
                 required
+                value={order.title}
+                onChange={(e) => setOrder({ ...order, title: e.target.value })}
               />
             </div>
             <div className="grid gap-3">
@@ -31,6 +48,10 @@ export const OrderForm = () => {
                 placeholder="Введите описание"
                 className="h-[150px]"
                 required
+                value={order.description}
+                onChange={(e) =>
+                  setOrder({ ...order, description: e.target.value })
+                }
               />
             </div>
             <div className="flex flex-col gap-3">
