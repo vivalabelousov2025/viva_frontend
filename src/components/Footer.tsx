@@ -14,7 +14,7 @@ export const Footer = () => {
           Сервис разработки ПО
         </span>
       </div>
-      <span className="text-lg text-zinc-500">© Все права защищены</span>
+      <span className="text-sm text-zinc-500">© Все права защищены</span>
     </div>
   );
 };

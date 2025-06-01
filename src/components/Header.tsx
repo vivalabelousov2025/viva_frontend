@@ -9,7 +9,7 @@ export const Header = () => {
   const { isAuthenticated, user } = useAuth();
 
   return (
-    <div className="max-w-[1440px] w-full px-2 py-4 flex items-center justify-between">
+    <div className="max-w-[1440px] bg-white w-full px-2 py-4 flex items-center justify-between">
       <div className="text-lg flex">
         <Link
           to="/"
@@ -54,7 +54,7 @@ export const Header = () => {
         </ul>
         <div className="flex gap-3">
           {isAuthenticated ? (
-            <>{user?.email} </>
+            <div className="py-[6px]">{user?.email} </div>
           ) : (
             <>
               <Button asChild variant={"outline"}>

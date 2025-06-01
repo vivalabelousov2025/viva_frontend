@@ -118,3 +118,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes gradientWave {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.animate-gradient-wave {
+  background: linear-gradient(
+    135deg,
+    #f1fff7,
+    #e9fff2,
+    #daffe1,
+    #e9fff2,
+    #f1fff7
+  );
+  background-size: 300% 300%;
+  animation: gradientWave 5s ease-in-out infinite;
+}

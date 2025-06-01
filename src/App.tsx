@@ -1,8 +1,9 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/auth-context";
 import { Layout } from "./components/Layout";
 import { TanstackContext } from "./context/tanstack-context";
+import { AnimatePresence } from "framer-motion";
 
 // pages
 import { Home } from "./pages/Home";
@@ -12,29 +13,82 @@ import { ManagerCabinet } from "./pages/ManagerCabinet";
 import { Orders } from "./pages/Orders";
 import { CreateOrder } from "./pages/CreateOrder";
 import NotFoundPage from "./pages/NotFound";
+import PageWrapper from "./components/AnimationPageWrapper";
 
 function AppRoutes() {
+  const location = useLocation();
   const { isAuthenticated, user } = useAuth();
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      {isAuthenticated ? (
-        <>
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/create-order" element={<CreateOrder />} />
-          <Route path="*" element={<NotFoundPage />} />
-          {user?.is_admin && (
-            <Route path="/manager" element={<ManagerCabinet />} />
-          )}
-        </>
-      ) : (
-        <>
-          <Route path="/sign-in" element={<SignIn />} />
-          <Route path="/sign-up" element={<SignUp />} />
-        </>
-      )}
-    </Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route
+          path="/"
+          element={
+            <PageWrapper>
+              <Home />
+            </PageWrapper>
+          }
+        />
+        {isAuthenticated ? (
+          <>
+            <Route
+              path="/orders"
+              element={
+                <PageWrapper>
+                  <Orders />
+                </PageWrapper>
+              }
+            />
+            <Route
+              path="/create-order"
+              element={
+                <PageWrapper>
+                  <CreateOrder />
+                </PageWrapper>
+              }
+            />
+            {user?.is_admin && (
+              <Route
+                path="/manager"
+                element={
+                  <PageWrapper>
+                    <ManagerCabinet />
+                  </PageWrapper>
+                }
+              />
+            )}
+            <Route
+              path="*"
+              element={
+                <PageWrapper>
+                  <NotFoundPage />
+                </PageWrapper>
+              }
+            />
+          </>
+        ) : (
+          <>
+            <Route
+              path="/sign-in"
+              element={
+                <PageWrapper>
+                  <SignIn />
+                </PageWrapper>
+              }
+            />
+            <Route
+              path="/sign-up"
+              element={
+                <PageWrapper>
+                  <SignUp />
+                </PageWrapper>
+              }
+            />
+          </>
+        )}
+      </Routes>
+    </AnimatePresence>
   );
 }
 
