@@ -25,7 +25,7 @@ export const ORDER_STATUS = {
   REJECTED: "Отклонена",
 };
 
-export const Orders = () => {
+export default function Orders() {
   const [selectedProject, setSelectedProject] = useState<IOrder | null>(null);
   const [filters, setFilters] = useState({ search: "", status: "" });
   const { data: actions } = useOrderActions(getCookie("access_token"));
@@ -227,4 +227,4 @@ export const Orders = () => {
       </Dialog>
     </>
   );
-};
+}

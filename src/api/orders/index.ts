@@ -13,7 +13,7 @@ export const getOrders = async (
     params.set("search", filters.search);
     params.set("field", "title");
   }
-  if (filters.status.length > 0) {
+  if (filters?.status?.length > 0) {
     params.set("status", filters.status);
   }
   const response = await instance.get(`/orders/`, {

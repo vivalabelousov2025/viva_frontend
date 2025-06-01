@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,20 +6,87 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { ChevronRight, ChevronLeft } from "lucide-react";
+import { useOrders } from "@/lib/hooks/orders";
+import { getCookie } from "@/lib/cookies";
+import type { IOrder } from "@/types/order";
 
-const teams = ["Команда 1", "Команда 2", "Команда 3"];
+const month = {
+  0: "Январь",
+  1: "Февраль",
+  2: "Март",
+  3: "Апрель",
+  4: "Май",
+  5: "Июнь",
+  6: "Июль",
+  7: "Август",
+  8: "Сентябрь",
+  9: "Октябрь",
+  10: "Ноябрь",
+  11: "Декабрь",
+};
 
 const GanttChart = () => {
-  const [selectedTeam, setSelectedTeam] = useState("Команда 1");
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const { data } = useOrders(
+    { search: "", status: "" },
+    getCookie("access_token")
+  );
 
-  const days = Array.from({ length: 22 }, (_, i) => i + 1);
+  const groupedOrders = useMemo(() => {
+    if (!data) return {};
+    return data.reduce((acc, order) => {
+      const teamName = order.team?.name || "Без команды";
+      if (!acc[teamName]) {
+        acc[teamName] = [];
+      }
+      acc[teamName].push(order);
+      return acc;
+    }, {} as Record<string, IOrder[]>);
+  }, [data]);
+
+  const getDaysInMonth = (date: Date) => {
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  };
+
+  const days = Array.from(
+    { length: getDaysInMonth(currentDate) },
+    (_, i) => i + 1
+  );
+  const currentMonth = month[currentDate.getMonth() as keyof typeof month];
+
+  const handlePrevMonth = () => {
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1)
+    );
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(
+      new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1)
+    );
+  };
+
+  const isOrderInCurrentMonth = (order: IOrder) => {
+    const startDate = new Date(order.estimated_start_date);
+    const endDate = new Date(order.estimated_end_date);
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(0, 0, 0, 0);
+    const currentMonthStart = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
+    const currentMonthEnd = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    );
+    currentMonthStart.setHours(0, 0, 0, 0);
+    currentMonthEnd.setHours(0, 0, 0, 0);
+    return startDate <= currentMonthEnd && endDate >= currentMonthStart;
+  };
 
   return (
     <div className="overflow-x-auto p-4">
@@ -27,12 +94,18 @@ const GanttChart = () => {
         <thead>
           <tr>
             <th className="border p-2 text-left">Месяц, год</th>
-            <th className="border p-2" colSpan={22}>
-              Май, 2025
+            <th className="border p-2" colSpan={days.length}>
+              <Button variant="outline" onClick={handlePrevMonth}>
+                <ChevronLeft />
+              </Button>
+              {currentMonth}, {currentDate.getFullYear()}
+              <Button variant="outline" onClick={handleNextMonth}>
+                <ChevronRight />
+              </Button>
             </th>
           </tr>
           <tr>
-            <th className="border p-2 text-left">Число</th>
+            <th className="border p-2 text-left">Команда</th>
             {days.map((day) => (
               <th key={day} className="border p-2 text-center">
                 {day}
@@ -41,57 +114,98 @@ const GanttChart = () => {
           </tr>
         </thead>
         <tbody>
-          {Array.from({ length: 8 }).map((_, rowIndex) => (
-            <tr key={rowIndex}>
-              <td className="border p-2">Команда 1</td>
-              {days.map((day, colIndex) => {
-                const isGreenBlock = rowIndex === 0 && day >= 1 && day <= 4;
-                const prevGreen = colIndex > 0 && day - 1 >= 1 && day - 1 <= 4;
-                const nextGreen = day + 1 >= 1 && day + 1 <= 4;
+          {Object.entries(groupedOrders).map(([teamName, orders]) => (
+            <tr key={teamName}>
+              <td className="border p-2">{teamName}</td>
+              {days.map((day) => {
+                const orderForDay = orders.find((order) => {
+                  if (order.team?.name !== teamName) return false;
+                  if (!isOrderInCurrentMonth(order)) return false;
+                  const currentDay = new Date(
+                    currentDate.getFullYear(),
+                    currentDate.getMonth(),
+                    day
+                  );
+                  const startDate = new Date(order.estimated_start_date);
+                  const endDate = new Date(order.estimated_end_date);
+                  startDate.setHours(0, 0, 0, 0);
+                  endDate.setHours(0, 0, 0, 0);
+                  currentDay.setHours(0, 0, 0, 0);
+                  return (
+                    currentDay.getTime() >= startDate.getTime() &&
+                    currentDay.getTime() <= endDate.getTime()
+                  );
+                });
 
-                const isStartOfBlock = isGreenBlock && !prevGreen;
-                const isEndOfBlock = isGreenBlock && !nextGreen;
+                if (!orderForDay) {
+                  return <td key={day} className="p-1 text-center border"></td>;
+                }
 
-                const greenClass = isGreenBlock
-                  ? `bg-green-500 ${isStartOfBlock ? "rounded-l-md" : ""} ${
-                      isEndOfBlock ? "rounded-r-md" : ""
-                    } ${prevGreen ? "border-l-0" : ""} ${
-                      nextGreen ? "border-r-0" : ""
-                    }`
-                  : "";
+                // Проверяем, является ли этот день началом задачи
+                const taskStartDay = Math.max(
+                  1,
+                  new Date(orderForDay.estimated_start_date).getMonth() ===
+                    currentDate.getMonth()
+                    ? new Date(orderForDay.estimated_start_date).getDate()
+                    : 1
+                );
+
+                // Вычисляем длительность задачи в днях
+                const taskEndDay = Math.min(
+                  getDaysInMonth(currentDate),
+                  new Date(orderForDay.estimated_end_date).getMonth() ===
+                    currentDate.getMonth()
+                    ? new Date(orderForDay.estimated_end_date).getDate()
+                    : getDaysInMonth(currentDate)
+                );
+                const adjustedTaskDuration = taskEndDay - taskStartDay + 1;
+
+                const isStartOfTask = day === taskStartDay;
+
+                if (!isStartOfTask) {
+                  return null;
+                }
 
                 return (
                   <td
                     key={day}
-                    className={`p-1 text-center border ${greenClass}`.trim()}
+                    className="p-1 text-center border bg-green-500 text-white"
+                    {...(adjustedTaskDuration > 1
+                      ? { colSpan: adjustedTaskDuration }
+                      : {})}
                   >
-                    {isGreenBlock ? (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <button className="w-full h-6 cursor-pointer"></button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Изменить команду</DialogTitle>
-                          </DialogHeader>
-                          <Select
-                            value={selectedTeam}
-                            onValueChange={setSelectedTeam}
-                          >
-                            <SelectTrigger className="w-full mt-4">
-                              <SelectValue placeholder="Выберите команду" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {teams.map((team) => (
-                                <SelectItem key={team} value={team}>
-                                  {team}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </DialogContent>
-                      </Dialog>
-                    ) : null}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button className="w-full h-full cursor-pointer hover:bg-green-600 transition-colors">
+                          {orderForDay.title}
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>{orderForDay.title}</DialogTitle>
+                        </DialogHeader>
+                        <div className="mt-4">
+                          <p>
+                            <strong>Описание:</strong> {orderForDay.description}
+                          </p>
+                          <p>
+                            <strong>Статус:</strong> {orderForDay.status}
+                          </p>
+                          <p>
+                            <strong>Дата начала:</strong>{" "}
+                            {new Date(
+                              orderForDay.estimated_start_date
+                            ).toLocaleDateString()}
+                          </p>
+                          <p>
+                            <strong>Дата окончания:</strong>{" "}
+                            {new Date(
+                              orderForDay.estimated_end_date
+                            ).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </td>
                 );
               })}

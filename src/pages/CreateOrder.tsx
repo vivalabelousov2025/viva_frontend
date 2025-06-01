@@ -3,7 +3,7 @@ import { OrderForm } from "@/components/OrderForm";
 import Blob1 from "../assets/svg/blob1.svg";
 import Blob2 from "../assets/svg/blob2.svg";
 
-export const CreateOrder = () => {
+export default function CreateOrder() {
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div>
@@ -15,4 +15,4 @@ export const CreateOrder = () => {
       </div>
     </div>
   );
-};
+}

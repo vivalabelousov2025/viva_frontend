@@ -43,7 +43,7 @@ const actions = [
   { text: "Создан проект «Электронная коммерция»", time: "Вчера" },
 ];
 
-export const ManagerCabinet = () => {
+export default function ManagerCabinet() {
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold">Кабинет менеджера</h1>
@@ -127,4 +127,4 @@ export const ManagerCabinet = () => {
       </div>
     </div>
   );
-};
+}
