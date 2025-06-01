@@ -4,13 +4,13 @@ import { AuthProvider, useAuth } from "./context/auth-context";
 import { Layout } from "./components/Layout";
 import { TanstackContext } from "./context/tanstack-context";
 import { AnimatePresence } from "framer-motion";
+import { lazy } from "react";
 
 // pages
 import PageWrapper from "./components/AnimationPageWrapper";
 import Loading from "./pages/Loading";
 
 const Home = lazy(() => import("./pages/Home"));
-const GanttChart = lazy(() => import("./pages/Diag"));
 const Orders = lazy(() => import("./pages/Orders"));
 const CreateOrder = lazy(() => import("./pages/CreateOrder"));
 const ManagerCabinet = lazy(() => import("./pages/ManagerCabinet"));
@@ -24,14 +24,6 @@ function AppRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route
-          path="/gantt"
-          element={
-            <PageWrapper>
-              <GanttChart />
-            </PageWrapper>
-          }
-        />
         <Route
           path="/"
           element={
