@@ -16,6 +16,7 @@ import NotFoundPage from "./pages/NotFound";
 import PageWrapper from "./components/AnimationPageWrapper";
 import ServerError from "./pages/ServerError";
 import Loading from "./pages/Loading";
+import GanttChart from "./pages/Diag";
 
 function AppRoutes() {
   const location = useLocation();
@@ -24,6 +25,14 @@ function AppRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        <Route
+          path="/gantt"
+          element={
+            <PageWrapper>
+              <GanttChart />
+            </PageWrapper>
+          }
+        />
         <Route
           path="*"
           element={
