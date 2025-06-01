@@ -6,7 +6,7 @@ import { useAuth } from "@/context/auth-context";
 
 export const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
 
   return (
     <div className="max-w-[1440px] bg-white w-full px-2 py-4 flex items-center justify-between">
@@ -54,7 +54,10 @@ export const Header = () => {
         </ul>
         <div className="flex gap-3">
           {isAuthenticated ? (
-            <div className="py-[6px]">{user?.email} </div>
+            <>
+              <div className="py-[6px]">{user?.email} </div>
+              <Button onClick={() => logout()}>Выйти</Button>
+            </>
           ) : (
             <>
               <Button asChild variant={"outline"}>
@@ -109,7 +112,10 @@ export const Header = () => {
           </ul>
           <div className="flex flex-col gap-3">
             {isAuthenticated ? (
-              <>{user?.email} </>
+              <>
+                <div className="py-[6px]">{user?.email} </div>
+                <Button onClick={() => logout()}>Выйти</Button>
+              </>
             ) : (
               <>
                 <Button asChild variant={"outline"}>
