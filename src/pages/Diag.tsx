@@ -11,6 +11,7 @@ import { ChevronRight, ChevronLeft } from "lucide-react";
 import { useOrders } from "@/lib/hooks/orders";
 import { getCookie } from "@/lib/cookies";
 import type { IOrder } from "@/types/order";
+import { useTeams } from "@/lib/hooks/teams";
 
 const month = {
   0: "Январь",
@@ -33,6 +34,7 @@ const GanttChart = () => {
     { search: "", status: "" },
     getCookie("access_token")
   );
+  const { data: teams } = useTeams();
 
   const groupedOrders = useMemo(() => {
     if (!data) return {};

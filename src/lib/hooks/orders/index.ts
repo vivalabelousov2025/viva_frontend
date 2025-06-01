@@ -3,7 +3,7 @@ import type { IOrder } from "@/types/order";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useOrders = (
-  filters?: {
+  filters: {
     search: string;
     status: string;
   },

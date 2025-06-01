@@ -27,29 +27,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-const frameworks = [
-  {
-    value: "team1",
-    label: "Team 1",
-  },
-  {
-    value: "team2",
-    label: "Team 2",
-  },
-  {
-    value: "team3",
-    label: "Team 3",
-  },
-  {
-    value: "team4",
-    label: "Team 4",
-  },
-  {
-    value: "team5",
-    label: "Team 5",
-  },
-];
+import { useMutationChangeOrderTeam, useTeams } from "@/lib/hooks/teams";
 
 const month = {
   0: "Январь",
@@ -71,10 +49,19 @@ const ManagerCabinet = () => {
   const [value, setValue] = useState("");
 
   const [currentDate, setCurrentDate] = useState(new Date());
-  const { data } = useOrders(
+  const { data, refetch: orderRefetch } = useOrders(
     { search: "", status: "" },
     getCookie("access_token")
   );
+  const { data: teams } = useTeams();
+
+  const { mutate: changeOrderTeam } = useMutationChangeOrderTeam(
+    getCookie("access_token")
+  );
+
+  const totalRefetch = () => {
+    orderRefetch();
+  };
 
   const groupedOrders = useMemo(() => {
     if (!data) return {};
@@ -262,9 +249,8 @@ const ManagerCabinet = () => {
                                 className="w-full justify-between"
                               >
                                 {value
-                                  ? frameworks.find(
-                                      (framework) => framework.value === value
-                                    )?.label
+                                  ? teams?.find((team) => team.name === value)
+                                      ?.name
                                   : "Выберите команду..."}
                                 <ChevronsUpDown className="opacity-50" />
                               </Button>
@@ -280,10 +266,10 @@ const ManagerCabinet = () => {
                                     No framework found.
                                   </CommandEmpty>
                                   <CommandGroup>
-                                    {frameworks.map((framework) => (
+                                    {teams?.map((team) => (
                                       <CommandItem
-                                        key={framework.value}
-                                        value={framework.value}
+                                        key={team.team_id}
+                                        value={team.name}
                                         onSelect={(currentValue) => {
                                           setValue(
                                             currentValue === value
@@ -291,13 +277,24 @@ const ManagerCabinet = () => {
                                               : currentValue
                                           );
                                           setOpen(false);
+                                          changeOrderTeam(
+                                            {
+                                              orderId: orderForDay.order_id,
+                                              teamId: team.team_id,
+                                            },
+                                            {
+                                              onSuccess: () => {
+                                                totalRefetch();
+                                              },
+                                            }
+                                          );
                                         }}
                                       >
-                                        {framework.label}
+                                        {team.name}
                                         <Check
                                           className={cn(
                                             "ml-auto",
-                                            value === framework.value
+                                            value === team.name
                                               ? "opacity-100"
                                               : "opacity-0"
                                           )}
