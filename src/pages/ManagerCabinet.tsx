@@ -213,7 +213,7 @@ const ManagerCabinet = () => {
                   >
                     <Dialog>
                       <DialogTrigger asChild>
-                        <button className="w-full h-full cursor-pointer hover:bg-green-600 transition-colors">
+                        <button className="w-full h-full cursor-pointer ring-none outline-none transition-colors">
                           {orderForDay.title}
                         </button>
                       </DialogTrigger>
